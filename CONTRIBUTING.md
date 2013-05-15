@@ -2,6 +2,8 @@ JavaScript style guide
 * Two spaces for indentation
 * Semicolons where semicolons should
 * Commas at the end  
+* Single quotes are prefered
+* Variables should not have underscores (expect for CoffeeScript-generated code)
 
 Please note that Lyria is public domain (See UNLICENSE.md)
 
