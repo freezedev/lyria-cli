@@ -1,5 +1,10 @@
 {
   "name": "lyria-cli",
   "version": "0.2.0",
-  "preferGlobal": true
+  "preferGlobal": true,
+  "dependencies": {
+    "commander": "1.1.1",
+    "colors": "*",
+    "hound": "*"
+  }
 }
