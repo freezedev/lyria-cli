@@ -1,0 +1,19 @@
+var program = require('commander');
+var bower = require('bower');
+
+var packageFile = require('../package.json');
+
+program
+  .version(packageFile.version)
+  .option('-c, --coffee', 'Use CoffeeScript')
+  .parse(process.argv);
+  
+var repositoryName = '';
+  
+if (program.coffee) {
+  repositoryName = 'lyria-template-coffee';
+} else {
+  repositoryName = 'lyria-template';
+}
+
+bower.commands
