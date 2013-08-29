@@ -16,45 +16,73 @@ program
 var rootDir = process.cwd();
 
 program
-  .command('project <name>')
+  .command('project <action> <name>')
   .description('Creates a new project')
   .option('-c, --coffee', 'Use CoffeeScript')
-  .action(function(name, options) {
+  .action(function(action, name, options) {
     var repositoryName = '';
     
     var directory = program.dir;
     var projectDir = path.join.apply(this, _.compact([rootDir, directory]));
+  
+    switch (action) {
+      case 'add': {
+        console.log('Downloading ' + repositoryName + ' using bower');
+    
+        if (!fs.existsSync(projectDir)) {
+          console.log('Creating project directory');
+          mkdirp.sync(projectDir);
+        }
+        
+        bower.commands.install([repositoryName]).on('end', function() {
+          if (projectDir !== rootDir) {
+            fs.renameSync(path.join.apply(this, _.compact([rootDir, 'bower_components'])), path.join.apply(this, _.compact([rootDir, directory, 'bower_components'])));
+          }
+          
+          var projectFiles = fs.readdirSync(path.join.apply(this, _.compact([rootDir, directory, 'bower_components', repositoryName])));
+          
+          for (var i = 0, j = projectFiles.length; i < j; i++) {
+            (function(item) {
+              fs.renameSync(path.join.apply(this, _.compact([rootDir, directory, 'bower_components', repositoryName, item])), path.join.apply(this, _.compact([projectDir, basename])));
+            })(projectFiles[i]);
+          }
+          
+          
+          fs.unlinkSync(path.join.apply(this, _.compact([rootDir, directory, 'bower_components', repositoryName])));
+          
+          console.log('Setting package.json');
+          var projectPackage = fs.readFileSync(path.join.apply(this, _.compact([rootDir, directory, 'package.json'])));
+          projectPackage = JSON.parse(projectPackage);
+          projectPackage.name = name;
+          fs.writeFileSync(path.join.apply(this, _.compact([rootDir, directory, 'package.json'])), projectPackage);
+        
+            
+          process.exit(0);
+        });
+      
+        break;
+      }
+      case 'deploy': {
+        break;
+      }
+      case 'watch': {
+        break;
+      }
+      case 'development': {
+        break;
+      }
+      case 'production': {
+        break;
+      }
+      default:
+        break;
+    }
   
     if (options.coffee) {
       repositoryName = 'lyria-template-coffee';
     } else {
       repositoryName = 'lyria-template';
     }
-    
-    console.log('Downloading ' + repositoryName + ' using bower');
-    
-    if (!fs.existsSync(projectDir)) {
-      console.log('Creating project directory');
-      mkdirp.sync(projectDir);
-    }
-    
-    bower.commands.install([repositoryName]).on('end', function() {
-      if (projectDir !== rootDir) {
-        fs.renameSync(path.join.apply(this, _.compact([rootDir, 'bower_components'])), path.join.apply(this, _.compact([rootDir, directory, 'bower_components'])));
-      }
-      
-      
-    
-      fs.rename(path.join.apply(this, _.compact([rootDir, directory, 'bower_components', repositoryName])), projectDir, function(err, res) {
-        if (err) {
-          throw new Error(err);
-        }
-        
-        process.exit(0);
-      });
-    
-      
-    });
   });
   
 program
